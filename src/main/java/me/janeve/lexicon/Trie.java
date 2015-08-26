@@ -103,11 +103,21 @@ public class Trie {
         Set<String> words = new TreeSet<String>();
 
         if(isWord) {
-            words.add( getCompleteWord() );
+            words.add(getCompleteWord());
         }
 
-        if (prefix.length() > 1 && children != null && children.containsKey(prefix.charAt(0))) {
-            words.addAll( children.get(prefix.charAt(0)).getWords(prefix.substring(1)) );
+        if(prefix.length() <= charSequence.length() && charSequence.startsWith(prefix)){
+            words.addAll( getWords() );
+            return words;
+        }
+
+        Trie child = children.get(prefix.charAt(charSequence.length()));
+        if( child != null ) {
+            if(parent == null)  {
+                words.addAll( child.getWords( prefix ) );
+            } else {
+                words.addAll( child.getWords( prefix.replaceFirst("^"+charSequence, "") ) );
+            }
         }
 
         return words;
@@ -147,22 +157,22 @@ public class Trie {
         this.charSequence = "";
     }
 
-    public void printTreeView(int i){
+    public void printTreeView(int noOfSpaces){
 
-//        printSpaces(i);
+//        printSpaces(noOfSpaces);
         System.out.print(charSequence);
         if(isWord()) { System.out.print("."); }
         if(isLeaf()) { System.out.print("$"); }
         System.out.println();
         if(children != null && children.size() > 0) {
-            printSpaces(i);
+            printSpaces(noOfSpaces);
             System.out.println("|");
 
             for(Map.Entry<Character, Trie> entry:children.entrySet()){
-                printSpaces(i);
+                printSpaces(noOfSpaces);
                 System.out.print(entry.getKey());
                 System.out.print("--");
-                entry.getValue().printTreeView(i+1);
+                entry.getValue().printTreeView(noOfSpaces+1);
             }
 
         }
@@ -170,8 +180,8 @@ public class Trie {
 
     }
 
-    private void printSpaces(int i) {
-        for(int j=0; j<=(i*8); j++) {
+    private void printSpaces(int noOfSpaces) {
+        for(int j=0; j<=(noOfSpaces*8); j++) {
             System.out.print(" ");
         }
     }

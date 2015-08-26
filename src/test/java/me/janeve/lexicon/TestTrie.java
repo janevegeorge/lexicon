@@ -15,11 +15,18 @@ public class TestTrie {
 
     Trie trie;
 
-    @Before public void initialize() {
+    @Before
+    public void initialize() {
         trie = new Trie();
     }
 
-    @Test public void newTrieShouldBeValid(){
+    @Test(expected=NullPointerException.class)
+    public void addingNullThrowsException() {
+        trie.addWord(null);
+    }
+
+    @Test
+    public void newTrieShouldBeValid() {
         assertNotNull(trie);
         assertTrue("Empty trie node will always be leaf node.", trie.isLeaf());
         assertFalse("Empty trie node cannot be a word.", trie.isWord());
@@ -27,14 +34,16 @@ public class TestTrie {
 
     }
 
-    @Test public void addingOneWordShouldSucceed(){
+    @Test
+    public void addingOneWordShouldSucceed() {
         String expectedWord = generateAWord("winner");
         trie.addWord(expectedWord);
 
         assertTrue(expectedWord + " should be found in trie.", trieContainsWord(expectedWord));
     }
 
-    @Test public void addingTwoWordShouldSucceed(){
+    @Test
+    public void addingTwoWordShouldSucceed() {
         String expectedWord1 = generateAWord("winner");
         String expectedWord2 = generateAWord("winner");
 
@@ -45,7 +54,8 @@ public class TestTrie {
         assertTrue(expectedWord2 + " should be found in trie.", trieContainsWord(expectedWord2));
     }
 
-    @Test public void testingUnmatchedPrefix(){
+    @Test
+    public void testingUnmatchedPrefix() {
         String expectedWord1 = generateAWord("winner");
         String expectedWord2 = generateAWord("winner");
 
@@ -55,7 +65,8 @@ public class TestTrie {
         assertFalse(expectedWord2 + " should not be found in trie.", trieContainsWord(expectedWord2));
     }
 
-    @Test public void searchingByPrefixShouldReturnTrue(){
+    @Test
+    public void searchingByPrefixShouldReturnTrue() {
         final String prefix = "winner";
         String expectedWord = generateAWord(prefix);
 
@@ -64,7 +75,8 @@ public class TestTrie {
         assertTrue(expectedWord + " should be found in trie.", trieContainsWord(prefix, expectedWord));
     }
 
-    @Test public void searchingByDifferentPrefixShouldReturnFalse(){
+    @Test
+    public void searchingByDifferentPrefixShouldReturnFalse() {
         final String prefix = "winner";
         final String anotherPrefix = "looser";
         String expectedWord = generateAWord(prefix);
@@ -72,6 +84,62 @@ public class TestTrie {
         trie.addWord(expectedWord);
 
         assertFalse(expectedWord + " should not be found in trie.", trieContainsWord(anotherPrefix, expectedWord));
+    }
+
+    @Test
+    public void searchingAPrefixShouldReturnMultipleOutput() {
+        generateADictinaryOfWords();
+        final String prefix = "Ja";
+        final int expectedOutput = 2;
+
+        Set<String> words = trie.getWords(prefix);
+
+        assertNotNull("Trie should always return a result but not null.", words);
+        assertEquals(expectedOutput + " words should have been returned", expectedOutput, words.size());
+    }
+
+    @Test
+    public void searchingAPrefixShouldReturnSingleOutput() {
+        generateADictinaryOfWords();
+        final String prefix = "Ap";
+        final int expectedOutput = 1;
+
+        Set<String> words = trie.getWords(prefix);
+
+        assertNotNull("Trie should always return a result but not null.", words);
+        assertEquals(expectedOutput + " words should have been returned", expectedOutput, words.size());
+    }
+
+    @Test
+    public void searchingAPrefixShouldReturnNoOutput() {
+        generateADictinaryOfWords();
+        final String prefix = "BA";
+        final int expectedOutput = 0;
+
+        Set<String> words = trie.getWords(prefix);
+
+        assertNotNull("Trie should always return a result but not null.", words);
+        assertEquals(expectedOutput + " words should have been returned", expectedOutput, words.size());
+    }
+
+    @Test
+    public void searchingAPrefixWithParentAndChildren() {
+        generateADictinaryOfWords();
+        final String prefix = "March";
+        final int expectedOutput = 2;
+
+        Set<String> words = trie.getWords(prefix);
+
+        assertNotNull("Trie should always return a result but not null.", words);
+        assertEquals(expectedOutput + " words should have been returned", expectedOutput, words.size());
+    }
+
+    private void generateADictinaryOfWords() {
+        final String[] words = {"Janeve", "George", "January", "February", "March", "April", "May", "Marching"};
+
+        for (String word : words) {
+            trie.addWord(word);
+        }
     }
 
     private String generateAWord(String prefix) {
